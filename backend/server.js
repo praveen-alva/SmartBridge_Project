@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const session = require('express-session');
+const MongoStore=require('connect-mongo');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
@@ -23,6 +24,10 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    collectionName: 'sessions'
+  }),
   cookie: {
     secure: true,
     sameSite: 'None',
