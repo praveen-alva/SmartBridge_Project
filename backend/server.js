@@ -9,8 +9,8 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const complaintRoutes = require('./routes/complaints');
 const allowedOrigins = [
-  'http://localhost:5173',
-  'https://smartbridge-project-1.onrender.com'
+  'https://smartbridge-project-frontend.onrender.com',
+  'http://localhost:5173'
 ];
 
 
@@ -26,24 +26,6 @@ app.use(cors({
     }
   },
   credentials: true
-}));
-
-// Middleware
-app.use(express.json());
-
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI,
-    collectionName: 'sessions'
-  }),
-  cookie: {
-    secure: true,
-    sameSite: 'None',
-    httpOnly: true
-  }
 }));
 
 // MongoDB Connection
