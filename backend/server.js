@@ -8,12 +8,23 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
 const complaintRoutes = require('./routes/complaints');
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://smartbridge-project-1.onrender.com'
+];
+
 
 const app = express();
 
 // CORS Configuration
 app.use(cors({
-  origin: 'https://smartbridge-project-1.onrender.com',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
