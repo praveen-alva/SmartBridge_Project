@@ -11,7 +11,7 @@ const Register = () => {
     email: '',
     type: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
 
   const [error, setError] = useState('');
@@ -61,13 +61,13 @@ const Register = () => {
             { label: 'Full Name', name: 'name', type: 'text' },
             { label: 'Email', name: 'email', type: 'email' },
             { label: 'Password', name: 'password', type: 'password' },
-            { label: 'Confirm Password', name: 'confirmPassword', type: 'password' }
+            { label: 'Confirm Password', name: 'confirmPassword', type: 'password' },
           ].map(({ label, name, type }) => (
             <div key={name}>
               <label className="block mb-1 font-medium">{label}</label>
               <input
-                name={name}
                 type={type}
+                name={name}
                 value={form[name]}
                 onChange={handleChange}
                 required

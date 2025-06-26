@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const Login = () => {
   const navigate = useNavigate();
+
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,13 +22,8 @@ const Login = () => {
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/login`,
-        {
-          email: form.email,
-          password: form.password,
-        },
-        {
-          withCredentials: true,
-        }
+        form,
+        { withCredentials: true }
       );
 
       localStorage.setItem('user', JSON.stringify(res.data.user));
@@ -41,7 +37,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-[#eff6ff] px-4">
-      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg space-y-4">
+      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow space-y-4">
         <div className="text-center">
           <h1 className="text-2xl font-bold">Sign in to your account</h1>
           <p className="text-sm text-gray-600">
@@ -54,29 +50,19 @@ const Login = () => {
         {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1 font-medium">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border rounded"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-1 font-medium">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border rounded"
-            />
-          </div>
+          {['email', 'password'].map((field) => (
+            <div key={field}>
+              <label className="block mb-1 font-medium capitalize">{field}</label>
+              <input
+                type={field}
+                name={field}
+                value={form[field]}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border rounded"
+              />
+            </div>
+          ))}
 
           <button
             type="submit"

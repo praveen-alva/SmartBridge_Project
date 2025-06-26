@@ -1,29 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
+const BASE_URL = 'https://smartbridge-project-gvzr.onrender.com';
+
 const ComplaintDetails = () => {
   const { id } = useParams();
   const [complaint, setComplaint] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [messageText, setMessageText] = useState('');
 
   useEffect(() => {
     const fetchComplaint = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/complaints/${id}`);
+        const res = await fetch(`${BASE_URL}/api/complaints/${id}`);
         const data = await res.json();
-
-        if (res.ok) {
-          setComplaint(data);
-        } else {
-          setComplaint(null);
-        }
+        if (res.ok) setComplaint(data);
+        else setComplaint(null);
       } catch (err) {
-        console.error('Fetch error:', err);
+        console.error('❌ Fetch error:', err);
         setComplaint(null);
       }
     };
 
     fetchComplaint();
   }, [id]);
+
+  const handleSendMessage = () => {
+    if (!messageText.trim()) return;
+    const now = new Date();
+    const message = {
+      sender: 'You',
+      text: messageText.trim(),
+      date: now.toLocaleDateString(),
+      time: now.toLocaleTimeString(),
+    };
+    setMessages((prev) => [...prev, message]);
+    setMessageText('');
+  };
 
   if (!complaint) {
     return (
@@ -42,7 +55,7 @@ const ComplaintDetails = () => {
         <div className="w-full lg:w-[75%] bg-white p-6 rounded shadow border space-y-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex flex-col gap-2">
-              <h1 className="text-xl font-bold" >{complaint.name}</h1>
+              <h1 className="text-xl font-bold">{complaint.name}</h1>
               <h1 className="text-xl font-bold">{complaint.title}</h1>
               <div className="flex gap-2">
                 <p className="bg-yellow-100 text-red-800 px-3 py-1 rounded">{complaint.status}</p>
@@ -70,7 +83,9 @@ const ComplaintDetails = () => {
             <h4 className="font-semibold mb-1">Attachments</h4>
             <div className="flex justify-between items-center px-4 py-2 bg-[#f9fafc] rounded border">
               <p>{complaint.attachment || 'None'}</p>
-              <i className="fa-solid fa-download text-blue-600 cursor-pointer"></i>
+              {complaint.attachment && (
+                <i className="fa-solid fa-download text-blue-600 cursor-pointer"></i>
+              )}
             </div>
           </div>
         </div>
@@ -122,44 +137,42 @@ const ComplaintDetails = () => {
         </ol>
       </div>
 
-    <div className="w-[90%] bg-white rounded shadow border">
-  <h4 className="font-semibold px-6 pt-4">Message</h4>
-  <hr />
-
-  <div className="max-h-64 overflow-y-auto p-4 space-y-3">
-    {messages.length === 0 ? (
-      <div className="text-center text-gray-500">
-        <i className="fa-regular fa-comment text-2xl mb-2"></i>
-        <p>No message yet. Start a conversation!</p>
-      </div>
-    ) : (
-      messages.map((msg, i) => (
-        <div key={i} className="text-sm">
-          <div className="font-semibold">{msg.sender}</div>
-          <div className="text-gray-800">{msg.text}</div>
-          <div className="text-gray-500 text-xs">{msg.date} at {msg.time}</div>
+      <div className="w-[90%] bg-white rounded shadow border">
+        <h4 className="font-semibold px-6 pt-4">Message</h4>
+        <hr />
+        <div className="max-h-64 overflow-y-auto p-4 space-y-3">
+          {messages.length === 0 ? (
+            <div className="text-center text-gray-500">
+              <i className="fa-regular fa-comment text-2xl mb-2"></i>
+              <p>No message yet. Start a conversation!</p>
+            </div>
+          ) : (
+            messages.map((msg, i) => (
+              <div key={i} className="text-sm">
+                <div className="font-semibold">{msg.sender}</div>
+                <div className="text-gray-800">{msg.text}</div>
+                <div className="text-gray-500 text-xs">{msg.date} at {msg.time}</div>
+              </div>
+            ))
+          )}
         </div>
-      ))
-    )}
-  </div>
 
-  <div className="flex items-center gap-2 px-6 pb-6 mt-4">
-    <input
-      type="text"
-      placeholder="Type your message"
-      value={messageText}
-      onChange={(e) => setMessageText(e.target.value)}
-      className="w-full border border-gray-300 rounded px-3 py-2"
-    />
-    <button
-      onClick={handleSendMessage}
-      className="bg-blue-600 text-white px-4 py-2 rounded"
-    >
-      <i className="fa-regular fa-paper-plane"></i> Send
-    </button>
-  </div>
-</div>
-
+        <div className="flex items-center gap-2 px-6 pb-6 mt-4">
+          <input
+            type="text"
+            placeholder="Type your message"
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
+            className="w-full border border-gray-300 rounded px-3 py-2"
+          />
+          <button
+            onClick={handleSendMessage}
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            <i className="fa-regular fa-paper-plane"></i> Send
+          </button>
+        </div>
+      </div>
 
       <div className="w-[90%] text-left text-blue-600">
         <Link to="/dashboard" className="text-blue-600 text-sm mt-4 inline-block">← Back to Dashboard</Link>
