@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
+const session = require('express-session');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
@@ -9,23 +10,36 @@ const complaintRoutes = require('./routes/complaints');
 
 const app = express();
 
+// CORS Configuration
+app.use(cors({
+  origin: 'https://smartbridge-project-1.onrender.com',
+  credentials: true
+}));
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: true,
+    sameSite: 'None',
+    httpOnly: true
+  }
+}));
+
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('✅ Connected to MongoDB'))
-.catch((err) => console.error('❌ MongoDB connection error:', err));
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // Routes
 app.use('/api', authRoutes);
 app.use('/api/complaints', complaintRoutes);
 
-// Send Feedback Email
+// Feedback Email Route
 app.post('/api/send-feedback-mail', async (req, res) => {
   const { email, name, complaintTitle, complaintId } = req.body;
 
@@ -62,4 +76,6 @@ app.post('/api/send-feedback-mail', async (req, res) => {
 
 // Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});

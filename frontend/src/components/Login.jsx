@@ -17,12 +17,19 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-  
+
     try {
-      const res = await axios.post('/api/login', {
-        email: form.email,
-        password: form.password
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/login`,
+        {
+          email: form.email,
+          password: form.password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
       localStorage.setItem('user', JSON.stringify(res.data.user));
       navigate('/dashboard');
     } catch (err) {
@@ -31,7 +38,7 @@ const Login = () => {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen flex justify-center items-center bg-[#eff6ff] px-4">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg space-y-4">
@@ -50,8 +57,8 @@ const Login = () => {
           <div>
             <label className="block mb-1 font-medium">Email</label>
             <input
-              name="email"
               type="email"
+              name="email"
               value={form.email}
               onChange={handleChange}
               required
@@ -62,8 +69,8 @@ const Login = () => {
           <div>
             <label className="block mb-1 font-medium">Password</label>
             <input
-              name="password"
               type="password"
+              name="password"
               value={form.password}
               onChange={handleChange}
               required
